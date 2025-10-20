@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model registry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-robot"></i> Model Registry
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#models">Browse</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#ingest">Ingest</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#health">Health</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Hero Section -->
+        <div class="jumbotron bg-light p-5 rounded mb-4">
+            <h1 class="display-4">🤖 Trustworthy Model Registry</h1>
+            <p class="lead">Manage and evaluate machine learning models with confidence</p>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Upload Tab -->
+            <div class="tab-pane fade show active" id="upload">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="bi bi-cloud-upload"></i> Upload New Model</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm">
+                            <div class="mb-3">
+                                <label for="modelName" class="form-label">Model Name</label>
+                                <input type="text" class="form-control" id="modelName"
+                                       placeholder="e.g., bert-base-uncased" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="modelVersion" class="form-label">Version</label>
+                                <input type="text" class="form-control" id="modelVersion"
+                                       placeholder="e.g., 1.0.0" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="modelFile" class="form-label">Model File (.zip)</label>
+                                <input type="file" class="form-control" id="modelFile"
+                                       accept=".zip" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload"></i> Upload Model
+                            </button>
+                        </form>
+                        <div id="uploadResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Models Tab -->
+            <div class="tab-pane fade" id="models">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h2><i class="bi bi-list-ul"></i> Available Models</h2>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadModels()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="modelsList" class="row"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ingest Tab -->
+            <div class="tab-pane fade" id="ingest">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="bi bi-download"></i> Ingest from HuggingFace</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="ingestForm">
+                            <div class="mb-3">
+                                <label for="hfUrl" class="form-label">HuggingFace URL</label>
+                                <input type="url" class="form-control" id="hfUrl"
+                                       placeholder="https://huggingface.co/bert-base-uncased" required>
+                                <div class="form-text">
+                                    Model must score ≥0.5 on all quality metrics to be ingested
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-cloud-download"></i> Ingest Model
+                            </button>
+                        </form>
+                        <div id="ingestResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Tab -->
+            <div class="tab-pane fade" id="health">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h2><i class="bi bi-heart-pulse"></i> System Health Dashboard</h2>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadHealth()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="healthDashboard" class="row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="modal fade" id="ratingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ratingModalLabel">Model Rating</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Rating content will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
